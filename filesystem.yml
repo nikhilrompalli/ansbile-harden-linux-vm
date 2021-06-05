@@ -1,0 +1,103 @@
+--- 
+# This task is imported in main.yaml
+  - name: Create /etc/modprobe.d/blacklist-filesystem.conf file
+    file:
+      dest: /etc/modprobe.d/blacklist-filesystem.conf
+      state: touch
+      owner: root
+      group: root
+      mode: 0600
+      
+  - name: Disable Mounting of cramfs Filesystems
+    lineinfile: >
+      state=present
+      dest=/etc/modprobe.d/blacklist-filesystem.conf
+      line="install cramfs /bin/true"
+      
+  - name: Disable Mounting of freevxfs Filesystems
+    lineinfile: >
+      state=present
+      dest=/etc/modprobe.d/blacklist-filesystem.conf
+      line="install freevxfs /bin/true"
+      
+  - name: Disable Mounting of jffs2 Filesystems
+    lineinfile: >
+      state=present
+      dest=/etc/modprobe.d/blacklist-filesystem.conf
+      line="install jffs2 /bin/true"
+      
+  - name: Disable Mounting of hfs Filesystems
+    lineinfile: >
+      state=present
+      dest=/etc/modprobe.d/blacklist-filesystem.conf
+      line="install hfs /bin/true"
+      
+  - name: Disable Mounting of hfsplus Filesystems
+    lineinfile: >
+      state=present
+      dest=/etc/modprobe.d/blacklist-filesystem.conf
+      line="install hfsplus /bin/true"
+      
+  - name: Disable Mounting of squashfs Filesystems
+    lineinfile: >
+      state=present
+      dest=/etc/modprobe.d/blacklist-filesystem.conf
+      line="install squashfs /bin/true"
+      
+  - name: Disable Mounting of udf Filesystems
+    lineinfile: >
+      state=present
+      dest=/etc/modprobe.d/blacklist-filesystem.conf
+      line="install udf /bin/true"
+      
+  - name: Add nodev Option to /home Partition
+    mount: 
+      name: "/home"
+      src: {{ item.device }}
+      state: mounted
+      fstype: {{ item.fstype }}
+      opts: "nodev"
+    when: item.mount == "/home"
+    with_items: ansible_mounts
+    
+  - name: Add nodev,nosuid,noexec Option to /dev/shm Partition
+    mount: 
+      name: "/dev/shm"
+      src: "none"
+      state: mounted
+      fstype: "tmpfs"
+      opts: "nodev,nosuid,noexec"
+      
+  - name: Configure package manager repository
+    command: apt-get update
+    when: ansible_distribution == "Ubuntu"
+    
+  - name: Configure GPG key
+    command: gpg --quiet --with-fingerprint /etc/apt/trusted.gpg.d/
+    when: ansible_distribution == "Ubuntu"
+    
+  - name: Enable SELinux in /etc/grub.conf
+    lineinfile: >
+      state=absent
+      dest=/etc/grub.conf
+      line="enforcing=0"
+      
+  - name: Set the SELinux Policy
+    selinux: >
+      state=enforcing
+      policy=targeted  
+      
+  - name: Enable Login Banner
+    lineinfile: >
+      state=present
+      dest=/etc/issue.net
+      line="All connections are monitored and recorded, *Disconnect IMMEDIATELY if you are not an authorized user!"
+      
+  - name: Enable Login Banner from /etc/ssh/sshd_config
+    lineinfile: >
+      state=present
+      dest=/etc/issue.net
+      regexp="#Banner /etc/issue.net\s+"
+      line="Banner /etc/issue.net"
+
+    

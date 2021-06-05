@@ -1,0 +1,40 @@
+---
+# This task is imported in main.yaml
+  - name: Install the rsyslog Package
+    apt: >
+      name=rsyslog
+      state=present
+
+  - name: Activate the rsyslog Service
+    service: >
+      name=rsyslog
+      enabled=yes
+      state=started
+
+  - name: Configure /etc/rsyslog.conf
+    copy: >
+      src=etc/rsyslog.conf
+      dest=/etc/rsyslog.conf
+      owner=root
+      group=root
+      mode=0644
+
+  - name: Create and Set Permissions on rsyslog Log Files
+    file: >
+      path=/var/log/{{ item }}
+      state=touch
+      owner=root
+      group=wheel
+      mode=0640
+    with_items:
+        - messages
+        - kern.log
+        - daemon.log
+        - syslog
+        - unused.log
+
+  - name: Configure logrotate
+    copy: >
+      src=etc/logrotate.d/syslog
+      dest=/etc/logrotate.d/syslog
+      

@@ -1,0 +1,25 @@
+---
+# This ansible script is to harden the linux VM
+# This script is developed by refering CIS_Ubuntu_18.04_LTS_Benchmark_v2.0.1
+
+- hosts: all
+  user: root
+  tasks:
+      # This task is to harden filesystem
+    - import_tasks: filesystem.yml
+      
+      # This task is to harden the services
+    - import_tasks: services.yml
+      
+      # This task is to harden the networking
+    - import_tasks: networking.yml
+      
+      # This task is to harden the logging
+    - import_tasks: logging.yml
+      
+      # This task is to harden the permissions
+    - import_tasks: permission.yml
+      
+      # This task is to harden the accounts and passwords
+    - import_tasks: accounts_password.yml
+        

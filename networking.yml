@@ -1,0 +1,130 @@
+---
+# This task is imported in main.yaml
+  - name: Disable IP Forwarding
+    sysctl: >
+      name=net.ipv4.ip_forward
+      value=0
+      state=present
+
+  - name: Disable Send Packet Redirects
+    sysctl: >
+      name=net.ipv4.conf.all.send_redirects
+      value=0
+      state=present
+
+  - name: Disable Send Packet Redirects
+    sysctl: >
+      name=net.ipv4.conf.default.send_redirects
+      value=0
+      state=present
+
+  - name: Disable Source Routed Packet Acceptance
+    sysctl: >
+      name=net.ipv4.conf.all.accept_source_route
+      value=0
+      state=present
+      
+  - name: Disable Source Routed Packet Acceptance
+    sysctl: >
+      name=net.ipv4.conf.default.accept_source_route
+      value=0
+      state=present
+
+  - name: Disable ICMP Redirect Acceptance
+    sysctl: >
+      name=net.ipv4.conf.all.accept_redirects
+      value=0
+      state=present
+
+  - name: Disable ICMP Redirect Acceptance
+    sysctl: >
+      name=net.ipv4.conf.default.accept_redirects
+      value=0
+      state=present
+
+  - name: Log Suspicious Packets
+    sysctl: >
+      name=net.ipv4.conf.all.log_martians
+      value=1
+      state=present
+
+  - name: Log Suspicious Packets
+    sysctl: >
+      name=net.ipv4.conf.default.log_martians
+      value=1
+      state=present
+
+  - name: Enable Ignore Broadcast Requests
+    sysctl: >
+      name=net.ipv4.icmp_echo_ignore_broadcasts
+      value=1
+      state=present
+
+  - name: Disable Secure ICMP Redirect Acceptance
+    sysctl: >
+      name=net.ipv4.conf.all.secure_redirects
+      value=0
+      state=present
+
+  - name: Disable Secure ICMP Redirect Acceptance
+    sysctl: >
+      name=net.ipv4.conf.default.secure_redirects
+      value=0
+      state=present
+
+  - name: Install TCP Wrappers
+    apt: >
+      name=tcp_wrappers
+      state=present
+
+  - name: Create /etc/hosts.allow
+    lineinfile: >
+      state=present
+      create=yes
+      dest=/etc/hosts.allow
+      regexp=^ALL
+      line=ALL:{{ tcp_allow | default("ALL") }}
+
+  - name: Verify Permissions on /etc/hosts.allow
+    file: >
+      path=/etc/hosts.allow
+      mode=0644
+
+  - name: Disable DCCP
+    lineinfile: >
+      state=present
+      create=yes
+      dest=/etc/modprobe.d/blacklist-protocol.conf
+      line="install dccp /bin/true"
+      
+  - name: Disable SCTP
+    lineinfile: >
+      state=present
+      create=yes
+      dest=/etc/modprobe.d/blacklist-protocol.conf
+      line="install sctp /bin/true"
+  - name: Disable
+    lineinfile: >
+      state=present
+      create=yes
+      dest=/etc/modprobe.d/blacklist-protocol.conf
+      line="install rds /bin/true"
+    tags:
+      - notscored
+      - section4.6
+      - section4.6.3
+
+  - name: Disable TIPC
+    lineinfile: >
+      state=present
+      create=yes
+      dest=/etc/modprobe.d/blacklist-protocol.conf
+      line="install tipc /bin/true"
+
+  - name: Enable IPtables
+    service: >
+      name=iptables
+      enabled=yes
+      state=started
+    when: enable_iptables
+ 

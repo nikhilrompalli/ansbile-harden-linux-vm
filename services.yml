@@ -1,0 +1,98 @@
+---
+# This task is imported in main.yaml
+  - name: Remove telnet-server
+    apt: >
+      name=telnet-server
+      state=absent
+      
+  - name: Remove telnet-client
+    apt: >
+      name=telnet-client
+      state=absent
+
+  - name: Configure Network Time Protocol (ipv4) (Scored)
+    apt: >
+      name=ntp
+      state=installed 
+      
+  - name: Remove rsh-server
+    apt: >
+      name=rsh-server
+      state=absent
+      
+  - name: Remove rsh-client
+    apt: >
+      name=rsh-client
+      state=absent
+
+  - name: Remove talk
+    apt: >
+      name=talk
+      state=absent
+      
+  - name: Remove Talk-server
+    apt: >
+      name=talk-server
+      state=absent
+      
+  - name: Disable Samba
+    service: >
+      name=smdb
+      state=stopped
+      enabled=no
+
+  - name: Disable Squid
+    service: >
+      name=squid
+      state=stopped
+      enabled=no
+
+  - name: Disable SNMP
+    service: >
+      name=snmpd
+      state=stopped
+      enabled=no
+
+  - name: Disable rsync
+    service: >
+      name=rsync
+      state=stopped
+      enabled=no
+
+  - name: Disable LDAP
+    service: >
+      name=sldap
+      state=stopped
+      enabled=no
+
+  - name: Disable NFS
+    service: >
+      name=nfs-server
+      state=stopped
+      enabled=no
+
+  - name: Disable FTP
+    service: >
+      name=vsftp
+      state=stopped
+      enabled=no
+      
+  - name: Configure NTP
+    apt: >
+      pkg=ntp
+      state=installed    
+    always_run: yes
+
+  - name: Configure NTP ipv4
+    service: >
+      name=ntpd
+      state=started
+      enabled=yes
+
+  - name: Configure NTP file
+    lineinfile: >
+      dest=/etc/ntp.conf
+      state=present
+      regexp="^restrict default"
+      line="restrict default kod nomodify notrap nopeer noquery"
+ 

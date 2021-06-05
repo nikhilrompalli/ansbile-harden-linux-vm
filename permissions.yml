@@ -1,0 +1,153 @@
+---
+# This task is imported in main.yaml
+  - name: Enable crond Daemon
+    service: >
+      name=crond
+      enabled=yes
+      state=started
+
+  - name: Set User/Group Owner and Permission on /etc/crontab
+    file: >
+      path=/etc/crontab
+      owner=root
+      group=root
+      mode=0600
+
+  - name: Set User/Group Owner and Permission on /etc/cron.hourly
+    file: >
+      path=/etc/cron.hourly
+      owner=root
+      group=root
+      mode=0600
+
+  - name: Set User/Group Owner and Permission on /etc/cron.daily 
+    file: >
+      path=/etc/cron.daily
+      owner=root
+      group=root
+      mode=0600
+
+  - name: Set User/Group Owner and Permission on /etc/cron.weekly 
+    file: >
+      path=/etc/cron.weekly
+      owner=root
+      group=root
+      mode=0600
+
+  - name: Set User/Group Owner and Permission on /etc/cron.monthly
+    file: >
+      path=/etc/cron.monthly
+      owner=root
+      group=root
+      mode=0600
+
+  - name: Set User/Group Owner and Permission on /etc/cron.d
+    file: >
+      path=/etc/cron.d
+      state=directory
+      owner=root
+      group=root
+      mode=0700
+
+  - name: Set LogLevel to INFO
+    lineinfile: >
+      dest=/etc/ssh/sshd_config
+      regexp="^LogLevel "
+      line="LogLevel INFO"
+    notify: Reload sshd
+
+  - name: Set Permissions on /etc/ssh/sshd_config
+    file: >
+      path=/etc/ssh/sshd_config
+      owner=root
+      group=root
+      mode=0600
+    notify: Reload sshd
+
+  - name: Disable SSH X11 Forwarding
+    lineinfile: >
+      dest=/etc/ssh/sshd_config
+      regexp="^X11Forwarding "
+      line="X11Forwarding no"
+    notify: Reload sshd
+
+  - name: Set SSH MaxAuthTries to 4 or Less
+    lineinfile: >
+      dest=/etc/ssh/sshd_config
+      regexp="^MaxAuthTries "
+      line="MaxAuthTries 4"
+    notify: Reload sshd
+
+  - name: Set SSH IgnoreRhosts to Yes
+    lineinfile: >
+      dest=/etc/ssh/sshd_config
+      regexp="^IgnoreRhosts "
+      line="IgnoreRhosts yes"
+    notify: Reload sshd
+
+  - name: Set SSH HostbasedAuthentication to No
+    lineinfile: >
+      dest=/etc/ssh/sshd_config
+      regexp="^HostbasedAuthentication "
+      line="HostbasedAuthentication no"
+    notify: Reload sshd
+
+  - name: Disable SSH Root Login
+    lineinfile: >
+      dest=/etc/ssh/sshd_config
+      regexp="^PermitRootLogin "
+      line="PermitRootLogin no"
+    notify: Reload sshd
+
+
+  - name: Set SSH PermitEmptyPasswords to No
+    lineinfile: >
+      dest=/etc/ssh/sshd_config
+      regexp="^PermitEmptyPasswords "
+      line="PermitEmptyPasswords no"
+    notify: Reload sshd
+
+  - name: 6Do Not Allow Users to Set Environment Options
+    lineinfile: >
+      dest=/etc/ssh/sshd_config
+      regexp="^PermitUserEnvironment "
+      line="PermitUserEnvironment no"
+    notify: Reload sshd
+
+  - name: 6Use Only Approved Cipher in Counter Mode
+    lineinfile: >
+      dest=/etc/ssh/sshd_config
+      regexp="^Ciphers "
+      line="Ciphers aes128-ctr,aes192-ctr,aes256-ctr"
+    notify: Reload sshd
+
+  - name: 6Set Idle Timeout Interval for User Login
+    lineinfile: >
+      dest=/etc/ssh/sshd_config
+      regexp="^ClientAliveInterval "
+      line="ClientAliveInterval 300"
+    notify: Reload sshd
+
+  - name: 6Set Idle Timeout Interval for User Login
+    lineinfile: >
+      dest=/etc/ssh/sshd_config
+      regexp="^ClientAliveCountMax "
+      line="ClientAliveCountMax 0"
+    notify: Reload sshd
+
+  - name: 6Limit Access via SSH
+    lineinfile: >
+      dest=/etc/ssh/sshd_config 
+      regexp="^AllowUsers "
+      line="AllowUsers {{ ssh_allow_users }}"
+    notify: Reload ssh
+
+  - name: Configure System-Auth PAM
+    copy: >
+      src=etc/pam.d/system-auth
+      dest=/etc/pam.d/system-auth
+
+  - name: Configure Password-Auth PAM
+    copy: >
+      src=etc/pam.d/password-auth
+      dest=/etc/pam.d/password-auth
